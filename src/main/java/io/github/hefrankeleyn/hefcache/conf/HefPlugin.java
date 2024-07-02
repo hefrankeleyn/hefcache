@@ -1,4 +1,4 @@
-package io.github.hefrankeleyn.hefcache;
+package io.github.hefrankeleyn.hefcache.conf;
 
 public interface HefPlugin {
 

@@ -1,4 +1,4 @@
-package io.github.hefrankeleyn.hefcache;
+package io.github.hefrankeleyn.hefcache.core;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

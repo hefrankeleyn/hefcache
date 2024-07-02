@@ -1,4 +1,4 @@
-package io.github.hefrankeleyn.hefcache;
+package io.github.hefrankeleyn.hefcache.conf;
 
 import jakarta.annotation.Resource;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

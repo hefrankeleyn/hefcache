@@ -1,6 +1,6 @@
-package io.github.hefrankeleyn.hefcache;
+package io.github.hefrankeleyn.hefcache.core;
 
-import ch.qos.logback.classic.Logger;
+import io.github.hefrankeleyn.hefcache.conf.HefPlugin;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
