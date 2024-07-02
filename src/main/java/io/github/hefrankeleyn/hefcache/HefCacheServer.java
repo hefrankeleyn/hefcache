@@ -53,17 +53,19 @@ public class HefCacheServer implements HefPlugin {
             // 定义 channel ChannelConfig的配置
             // 设置服务器接受连接队列的长度，即等待连接的最大数量，高并发下控制等待连接的数量
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 128)
+                    // 小字节包也立马发送
+                    .childOption(ChannelOption.TCP_NODELAY, true)
                     // 开启keep-alive机制，长时间没有数据交互，仍然保持连接活跃
-                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
                     // 开启端口、地址重用
-                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .childOption(ChannelOption.SO_REUSEADDR, true)
                     // TCP 接收缓冲区大小
-                    .option(ChannelOption.SO_RCVBUF, 32 * 1024)
+                    .childOption(ChannelOption.SO_RCVBUF, 32 * 1024)
                     // TCP 发送缓冲区大小
-                    .option(ChannelOption.SO_SNDBUF, 32 * 1024)
+                    .childOption(ChannelOption.SO_SNDBUF, 32 * 1024)
                     // byteBuf 分配和优化策略
-                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .option(EpollChannelOption.SO_REUSEPORT, true);
+                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .childOption(EpollChannelOption.SO_REUSEPORT, true);
             // 这个channel 是serverchannel
             channel = serverBootstrap.bind(port).sync().channel();
             System.out.println("==> netty server start and listener on port " + port);
