@@ -73,4 +73,8 @@ public class HefCache {
             throw e;
         }
     }
+
+    public int strlen(String key) {
+        return Objects.isNull(map.get(key))? 0 : map.get(key).length();
+    }
 }

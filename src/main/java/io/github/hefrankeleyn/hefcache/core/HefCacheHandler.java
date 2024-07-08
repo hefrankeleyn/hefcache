@@ -1,12 +1,14 @@
 package io.github.hefrankeleyn.hefcache.core;
 
 import com.google.common.base.Strings;
+import io.github.hefrankeleyn.hefcache.command.UnknownCommand;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -38,77 +40,32 @@ public class HefCacheHandler extends SimpleChannelInboundHandler<String> {
                                             + "Mock server at 2024-06-30 17:37 in BeiJing" + CRLF;
 
     private static final HefCache cache = new HefCache();
-
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext,
                                 String message) throws Exception {
 
-        System.out.println("HefCacheHandler ==> " + message);
+        System.out.println(Strings.lenientFormat("HefCacheHandler ==> message: %s" , message));
         // 将message切分为数组
         String[] args = message.split(CRLF);
-        //
+        // 获取命令
         String cmd = args[2].toUpperCase();
-        if (cmd.equals(COMMAND)) {
-            // *len$len
-            String result = "*" + 2 + CRLF + "$" + COMMAND.length() + CRLF + COMMAND + CRLF + "$" + PING.length() + CRLF + PING + CRLF;
-            writeByteBuffer(channelHandlerContext, result);
-        } else if (cmd.equals(PING)) {
-            String result = "PONG";
-            // *2\r\n$4\r\nPING\r\n$n\r\nxxx\r\n
-            if (args.length >= 5) {
-                result = args[4];
-            }
-            writeSimpleString(channelHandlerContext, result);
-        } else if (cmd.equals(INFO)) {
-            writeBulkString(channelHandlerContext, INFO_VAL);
-        } else if (cmd.equals(SET)) {
-            String key = args[4];
-            String val = args[6];
-            cache.set(key, val);
-            writeSimpleString(channelHandlerContext, OK);
-        } else if (cmd.equals(GET)) {
-            String key = args[4];
-            String val = cache.get(key);
-            writeBulkString(channelHandlerContext, val);
-        } else if (cmd.equals(STRLEN)) {
-            String key = args[4];
-            int strlen = Objects.isNull(cache.get(key))? 0 : cache.get(key).length();
-            writeInteger(channelHandlerContext, strlen);
-        } else if (cmd.equals(EXISTS)) {
-            String[] keys = Stream.iterate(4, index->index<args.length, index->index+2).map(index->args[index]).toArray(String[]::new);
-            int existsNum = cache.exists(keys);
-            writeInteger(channelHandlerContext, existsNum);
-        } else if (cmd.equals(DEL)) {
-            String[] keys = Stream.iterate(4, index->index<args.length, index->index+2).map(index->args[index]).toArray(String[]::new);
-            int delNum = cache.del(keys);
-            writeInteger(channelHandlerContext, delNum);
-        } else if (cmd.equals(MGET)) {
-            String[] keys = Stream.iterate(4, index->index<args.length, index->index+2).map(index->args[index]).toArray(String[]::new);
-            String[] vals = cache.mget(keys);
-            writeArray(channelHandlerContext, vals);
-        } else if (cmd.equals(MSET)) {
-            String[] keys = Stream.iterate(4, index->index<args.length, index->index+4).map(index->args[index]).toArray(String[]::new);
-            String[] vals = Stream.iterate(6, index->index<args.length, index->index+4).map(index->args[index]).toArray(String[]::new);
-            cache.mset(keys, vals);
-            writeSimpleString(channelHandlerContext, OK);
-        } else if (cmd.equals(INCR)) {
-            String key = args[4];
-            try {
-                int val = cache.incr(key);
-                writeInteger(channelHandlerContext, val);
-            }catch (NumberFormatException e) {
-                String err = Strings.lenientFormat("NFE key: %s , value is not integer.", key);
-                writeError(channelHandlerContext, err);
-            }
-        } else if (cmd.equals(DECR)) {
-            String key = args[4];
-            try {
-                int val = cache.decr(key);
-                writeInteger(channelHandlerContext, val);
-            }catch (NumberFormatException e) {
-                String err = Strings.lenientFormat("NFE key: %s , value is not integer.", key);
-                writeError(channelHandlerContext, err);
-            }
+        Command command = Commands.getCommand(cmd);
+        Reply<?> reply = command.exec(cache, args);
+        System.out.println(Strings.lenientFormat("====> COM: %s, reply: %s", cmd, reply));
+        writeReply(channelHandlerContext, reply);
+    }
+
+    private void writeReply(ChannelHandlerContext channelHandlerContext, Reply<?> reply) {
+        if (Objects.equals(reply.getReplyType(), ReplyTypeEnum.SIMPLE_STRING)) {
+            writeSimpleString(channelHandlerContext, (String) reply.getValue());
+        } else if (Objects.equals(reply.getReplyType(), ReplyTypeEnum.BULK_STRING)) {
+            writeBulkString(channelHandlerContext, (String) reply.getValue());
+        } else if (Objects.equals(reply.getReplyType(), ReplyTypeEnum.INTEGER)) {
+            writeInteger(channelHandlerContext, (Integer) reply.getValue());
+        } else if (Objects.equals(reply.getReplyType(), ReplyTypeEnum.ARRAY)) {
+            writeArray(channelHandlerContext, (String[]) reply.getValue());
+        } else if (Objects.equals(reply.getReplyType(), ReplyTypeEnum.ERROR)) {
+            writeError(channelHandlerContext, (String) reply.getValue());
         } else {
             writeSimpleString(channelHandlerContext, OK);
         }
