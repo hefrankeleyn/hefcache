@@ -22,6 +22,10 @@ public class Commands {
         // common commands
         registerCommand(new PingCommand());
         registerCommand(new InfoCommand());
+        // command
+        registerCommand(new CommandCommand());
+        // 未知命令
+        registerCommand(new UnknownCommand());
 
         // string commands
         registerCommand(new SetCommand());
@@ -34,10 +38,16 @@ public class Commands {
         registerCommand(new MsetCommand());
         registerCommand(new MgetCommand());
 
-        // command
-        registerCommand(new CommandCommand());
-        // 未知命令
-        registerCommand(new UnknownCommand());
+        // list : LPUSH RPUSH  lpop rpop lLen Lindex  Lrange
+        registerCommand(new LpushCommand());
+        registerCommand(new RpushCommand());
+        registerCommand(new LpopCommand());
+        registerCommand(new RpopCommand());
+        registerCommand(new LlenCommand());
+        registerCommand(new LindexCommand());
+        registerCommand(new LrangeCommand());
+
+
     }
 
     public static void registerCommand(Command command) {

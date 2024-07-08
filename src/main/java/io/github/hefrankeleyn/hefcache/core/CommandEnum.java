@@ -18,6 +18,13 @@ public enum CommandEnum {
     INCR,
     DECR,
     UNKNOWN,
-
+    // LIST
+    LPUSH,
+    RPUSH,
+    LPOP,
+    RPOP,
+    LLEN,
+    LINDEX,
+    LRANGE
     ;
 }

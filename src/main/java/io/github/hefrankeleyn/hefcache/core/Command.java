@@ -31,4 +31,8 @@ public interface Command {
     default String[] getValues(String[] args) {
         return Stream.iterate(6, index->index<args.length, index->index+4).map(index->args[index]).toArray(String[]::new);
     }
+
+    default String[] getParamsNoKey(String[] args) {
+        return Stream.iterate(6, index->index<args.length, index->index+2).map(index->args[index]).toArray(String[]::new);
+    }
 }
