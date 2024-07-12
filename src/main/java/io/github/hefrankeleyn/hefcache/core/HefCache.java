@@ -17,7 +17,7 @@ public class HefCache {
 
     public String get(String key){
         CacheEntry<String> entry = (CacheEntry<String>) map.get(key);
-        return entry.getValue();
+        return Objects.isNull(entry)? null: entry.getValue();
     }
 
     public void set(String key, String value) {
@@ -87,7 +87,7 @@ public class HefCache {
         if (Objects.isNull(values)) {
             return 0;
         }
-        map.putIfAbsent(key, new CacheEntry<>(Lists.newLinkedList()));
+        map.putIfAbsent(key, new CacheEntry<LinkedList<String>>(Lists.newLinkedList()));
         CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>)map.get(key);
         LinkedList<String> list = entry.getValue();
         for (String value : values) {
@@ -100,7 +100,7 @@ public class HefCache {
         if (Objects.isNull(values)) {
             return 0;
         }
-        map.putIfAbsent(key, new CacheEntry<>(Lists.newLinkedList()));
+        map.putIfAbsent(key, new CacheEntry<LinkedList<String>>(Lists.newLinkedList()));
         CacheEntry<LinkedList<String>> entry = (CacheEntry<LinkedList<String>>)map.get(key);
         LinkedList<String> list = entry.getValue();
         for (String value : values) {
