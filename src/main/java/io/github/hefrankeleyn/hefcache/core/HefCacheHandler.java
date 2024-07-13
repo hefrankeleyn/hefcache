@@ -26,11 +26,17 @@ public class HefCacheHandler extends SimpleChannelInboundHandler<String> {
         // 将message切分为数组
         String[] args = message.split(CRLF);
         // 获取命令
-        String cmd = args[2].toUpperCase();
-        Command command = Commands.getCommand(cmd);
-        Reply<?> reply = command.exec(cache, args);
-        System.out.println(Strings.lenientFormat("====> COM: %s, reply: %s", cmd, reply));
-        writeReply(channelHandlerContext, reply);
+        String cmd = null;
+        try {
+            cmd= args[2].toUpperCase();
+            Command command = Commands.getCommand(cmd);
+            Reply<?> reply = command.exec(cache, args);
+            System.out.println(Strings.lenientFormat("====> COM: %s, reply: %s", cmd, reply));
+            writeReply(channelHandlerContext, reply);
+        }catch (Exception e) {
+            String err = Strings.lenientFormat("CMD[%s], ERR exception: %s", cmd, e.getMessage());
+            writeError(channelHandlerContext, err);
+        }
     }
 
     private void writeReply(ChannelHandlerContext channelHandlerContext, Reply<?> reply) {
