@@ -46,6 +46,13 @@ public class Commands {
         registerCommand(new LlenCommand());
         registerCommand(new LindexCommand());
         registerCommand(new LrangeCommand());
+        // Set: sadd
+        registerCommand(new SaddCommand());
+        registerCommand(new SmembersCommand());
+        registerCommand(new ScardCommand());
+        registerCommand(new SismemberCommand());
+        registerCommand(new SremCommand());
+        registerCommand(new SpopCommand());
 
 
     }

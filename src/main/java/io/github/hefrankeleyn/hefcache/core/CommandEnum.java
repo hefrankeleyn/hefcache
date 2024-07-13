@@ -25,6 +25,16 @@ public enum CommandEnum {
     RPOP,
     LLEN,
     LINDEX,
-    LRANGE
+    LRANGE,
+    // SET
+    SADD,
+    SMEMBERS,
+    SCARD,
+    SISMEMBER,
+    SREM,
+    SPOP
+    // hash
+
+    // zset
     ;
 }
