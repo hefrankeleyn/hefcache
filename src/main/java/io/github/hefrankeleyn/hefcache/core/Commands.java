@@ -53,6 +53,14 @@ public class Commands {
         registerCommand(new SismemberCommand());
         registerCommand(new SremCommand());
         registerCommand(new SpopCommand());
+        // Hash
+        registerCommand(new HsetCommand());
+        registerCommand(new HgetCommand());
+        registerCommand(new HgetallCommand());
+        registerCommand(new HmgetCommand());
+        registerCommand(new HlenCommand());
+        registerCommand(new HexistsCommand());
+        registerCommand(new HdelCommand());
 
 
     }

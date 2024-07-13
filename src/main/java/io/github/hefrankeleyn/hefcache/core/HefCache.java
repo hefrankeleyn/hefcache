@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @Date 2024/7/2
@@ -246,4 +247,86 @@ public class HefCache {
     }
 
     // ======== 3. set end ==============
+    // ======== 4. hget begin ==============
+
+    public int hset(String key, String[] fields, String[] values) {
+        map.putIfAbsent(key, new CacheEntry<HashMap<String, String>>(new HashMap<>()));
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        HashMap<String, String> hashMap = entry.getValue();
+        int num = 0;
+        if (Objects.isNull(fields) || fields.length == 0) {
+            return num;
+        }
+        for (int i = 0; i < fields.length; i++) {
+            if (!hashMap.containsKey(fields[i])) {
+                num ++;
+            }
+            hashMap.put(fields[i], values[i]);
+        }
+        return num;
+    }
+
+    public String hget(String key, String field) {
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        if (Objects.isNull(entry) || Objects.isNull(entry.getValue()) || entry.getValue().isEmpty()) {
+            return null;
+        }
+        HashMap<String, String> hashMap = entry.getValue();
+        return hashMap.get(field);
+    }
+
+    public String[] hgetall(String key) {
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        if (Objects.isNull(entry) || Objects.isNull(entry.getValue()) || entry.getValue().isEmpty()) {
+            return null;
+        }
+        HashMap<String, String> hashMap = entry.getValue();
+        return hashMap.entrySet().stream()
+                .flatMap(mapentry-> Stream.of(mapentry.getKey(), mapentry.getValue()))
+                .toArray(String[]::new);
+    }
+
+    public String[] hmget(String key, String[] fields) {
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        if (Objects.isNull(entry) || Objects.isNull(entry.getValue()) || entry.getValue().isEmpty()) {
+            return null;
+        }
+        HashMap<String, String> hashMap = entry.getValue();
+        if (Objects.isNull(fields)) {
+            return null;
+        }
+        return Arrays.stream(fields).map(hashMap::get).toArray(String[]::new);
+    }
+
+    public int hlen(String key) {
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        if (Objects.isNull(entry) || Objects.isNull(entry.getValue()) || entry.getValue().isEmpty()) {
+            return 0;
+        }
+        HashMap<String, String> hashMap = entry.getValue();
+        return hashMap.size();
+    }
+
+    public int hexists(String key, String field) {
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        if (Objects.isNull(entry) || Objects.isNull(entry.getValue()) || entry.getValue().isEmpty()) {
+            return 0;
+        }
+        HashMap<String, String> hashMap = entry.getValue();
+        return hashMap.containsKey(field)? 1 : 0;
+    }
+
+    public int hdel(String key, String[] fields) {
+        CacheEntry<HashMap<String, String>> entry = (CacheEntry<HashMap<String, String>>) map.get(key);
+        if (Objects.isNull(entry) || Objects.isNull(entry.getValue()) || entry.getValue().isEmpty()) {
+            return 0;
+        }
+        HashMap<String, String> hashMap = entry.getValue();
+        if (Objects.isNull(fields)) {
+            return 0;
+        }
+        return (int) Arrays.stream(fields).map(hashMap::remove).filter(Objects::nonNull).count();
+    }
+
+    // ======== 4. hget end ==============
 }

@@ -8,6 +8,8 @@ public enum CommandEnum {
     COMMAND,
     PING,
     INFO,
+    UNKNOWN,
+    // String
     SET,
     GET,
     STRLEN,
@@ -17,7 +19,6 @@ public enum CommandEnum {
     MGET,
     INCR,
     DECR,
-    UNKNOWN,
     // LIST
     LPUSH,
     RPUSH,
@@ -32,8 +33,15 @@ public enum CommandEnum {
     SCARD,
     SISMEMBER,
     SREM,
-    SPOP
+    SPOP,
     // hash
+    HSET,
+    HGET,
+    HGETALL,
+    HMGET,
+    HLEN,
+    HDEL,
+    HEXISTS
 
     // zset
     ;
