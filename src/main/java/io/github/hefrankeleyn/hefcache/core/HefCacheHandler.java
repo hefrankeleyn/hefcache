@@ -10,6 +10,8 @@ import java.util.Objects;
 
 import static io.github.hefrankeleyn.hefcache.core.Command.OK;
 import static io.github.hefrankeleyn.hefcache.core.Command.CRLF;
+import static io.github.hefrankeleyn.hefcache.core.Command.NULL_FLAG;
+import static io.github.hefrankeleyn.hefcache.core.Command.EMPTY_FLAG;
 
 /**
  * @Date 2024/6/30
@@ -67,17 +69,17 @@ public class HefCacheHandler extends SimpleChannelInboundHandler<String> {
         StringBuffer sb = new StringBuffer();
         sb.append(ReplyTypeEnum.ARRAY.getPrefix());
         if (Objects.isNull(array)) {
-            sb.append("-1");
+            sb.append(NULL_FLAG);
             sb.append(CRLF);
         } else if (array.length==0) {
-            sb.append("0");
+            sb.append(EMPTY_FLAG);
             sb.append(CRLF);
         }else {
             sb.append(array.length);
             sb.append(CRLF);
             for (Object val : array) {
                 if (Objects.isNull(val)) {
-                    sb.append(ReplyTypeEnum.BULK_STRING.getPrefix() + "-1" + CRLF);
+                    sb.append(ReplyTypeEnum.BULK_STRING.getPrefix() + NULL_FLAG + CRLF);
                 }else if (val instanceof Integer numVal) {
                     sb.append(integerString(numVal));
                 }else if (val instanceof String stringVal) {
@@ -96,20 +98,23 @@ public class HefCacheHandler extends SimpleChannelInboundHandler<String> {
         writeByteBuffer(channelHandlerContext, arrayString(vals));
     }
 
-    private String integerString(int num) {
+    private String integerString(Integer num) {
+        if (Objects.isNull(num)) {
+            return ReplyTypeEnum.BULK_STRING.getPrefix() + NULL_FLAG + CRLF;
+        }
         return ReplyTypeEnum.SIMPLE_STRING.getPrefix() + num + CRLF;
     }
 
-    private void writeInteger(ChannelHandlerContext channelHandlerContext, int num) {
+    private void writeInteger(ChannelHandlerContext channelHandlerContext, Integer num) {
         writeByteBuffer(channelHandlerContext, integerString(num));
     }
 
     private String bulkString(Object context) {
         String result;
         if (Objects.isNull(context)) {
-            result = ReplyTypeEnum.BULK_STRING.getPrefix() + "-1" + CRLF;
+            result = ReplyTypeEnum.BULK_STRING.getPrefix() + NULL_FLAG + CRLF;
         } else if (context.toString().isEmpty()) {
-            result = ReplyTypeEnum.BULK_STRING.getPrefix() + "0" + CRLF;
+            result = ReplyTypeEnum.BULK_STRING.getPrefix() + EMPTY_FLAG + CRLF;
         } else {
             result = ReplyTypeEnum.BULK_STRING.getPrefix() + context.toString().getBytes().length + CRLF + context + CRLF;
         }
@@ -123,9 +128,9 @@ public class HefCacheHandler extends SimpleChannelInboundHandler<String> {
     private String simpleString(String context) {
         String result;
         if (Objects.isNull(context)) {
-            result = ReplyTypeEnum.BULK_STRING.getPrefix() + "-1" + CRLF;
+            result = ReplyTypeEnum.BULK_STRING.getPrefix() + NULL_FLAG + CRLF;
         } else if (context.isEmpty()) {
-            result = ReplyTypeEnum.BULK_STRING.getPrefix() + "0" + CRLF;
+            result = ReplyTypeEnum.BULK_STRING.getPrefix() + EMPTY_FLAG + CRLF;
         }else {
             result = ReplyTypeEnum.SIMPLE_STRING.getPrefix() + context + CRLF;
         }

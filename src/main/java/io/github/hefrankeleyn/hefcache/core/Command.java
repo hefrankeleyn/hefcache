@@ -3,6 +3,8 @@ package io.github.hefrankeleyn.hefcache.core;
 import java.util.stream.Stream;
 
 public interface Command {
+    String NULL_FLAG = "-1";
+    String EMPTY_FLAG = "0";
     String CRLF = "\r\n";
     String OK = "OK";
     String name();

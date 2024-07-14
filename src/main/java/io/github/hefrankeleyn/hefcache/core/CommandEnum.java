@@ -41,8 +41,14 @@ public enum CommandEnum {
     HMGET,
     HLEN,
     HDEL,
-    HEXISTS
-
+    HEXISTS,
     // zset
+    ZADD,
+    ZCARD,
+    ZCOUNT,
+    ZSCORE,
+    ZRANK,
+    ZREM
+
     ;
 }
